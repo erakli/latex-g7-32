@@ -4,23 +4,28 @@
 \documentclass[utf8x, 14pt]{G7-32} % Стиль (по умолчанию будет 14pt)
 
 % Остальные стандартные настройки убраны в preamble.inc.tex.
-\include{preamble.inc}
+\input{tex/preamble.inc}
 
 \graphicspath{ {graphics/} }
 
+% Принудительно отключим minted
+\def\NoMinted{}
+
 % Настройки листингов.
 \ifPDFTeX
-\include{listings.inc}
+\input{tex/listings.inc}
 \else
 \usepackage{local-minted}
 \fi
 
 % Полезные макросы листингов.
-\include{macros.inc}
+\input{tex/macros.inc}
 
 % Стиль титульного листа и заголовки
-\include{00-title}
+\input{tex/00-title}
 
+% Для тестового заполнения текстом lorem ipsum
+\usepackage{blindtext}
 
 \begin{document}
 
@@ -36,9 +41,8 @@
 \end{executors}
 
 
-%\listoffigures                         % Список рисунков
-
-%\listoftables                          % Список таблиц
+\listoffigures                         % Список рисунков
+\listoftables                          % Список таблиц
 
 %\NormRefs % Нормативные ссылки 
 % Команды \breakingbeforechapters и \nonbreakingbeforechapters
@@ -48,36 +52,35 @@
 % \nobreakingbeforechapters
 % \breakingbeforechapters
 
-\include{00-abstract}
+\include{tex/00-abstract}
 
 \tableofcontents
 
 \printnomenclature % Автоматический список сокращений
 
-\include{12-intro}
+\include{tex/12-intro}
 
 \mainmatter % это включает нумерацию глав и секций в документе ниже
 
-\include{20-analysis}
-\include{30-design}
-\include{40-impl}
-\include{50-research}
-\include{60-economics}
-\include{70-bzd}
+\include{tex/20-analysis}
+\include{tex/30-design}
+\include{tex/40-impl}
+\include{tex/50-research}
+\include{tex/60-economics}
+\include{tex/70-bzd}
 
 \backmatter %% Здесь заканчивается нумерованная часть документа и начинаются ссылки и
             
-\include{80-conclusion}%% заключение
+\include{tex/80-conclusion}%% заключение
 
 
-\include{81-biblio}
+\include{tex/81-biblio}
 
 
 \appendix   % Тут идут приложения
 
-\include{90-appendix1}
-
-\include{91-appendix2}
+\include{tex/90-appendix1}
+\include{tex/91-appendix2}
 
 \end{document}
 
