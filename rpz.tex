@@ -5,6 +5,7 @@
 
 % Остальные стандартные настройки убраны в preamble.inc.tex.
 \input{common/preamble.inc}
+\input{tex/packages}
 
 \graphicspath{ {graphics/} }
 
@@ -22,16 +23,13 @@
 \input{common/macros.inc}
 
 % Стиль титульного листа и заголовки
-\input{tex/00-title}
-
-% Для тестового заполнения текстом lorem ipsum
-\usepackage{blindtext}
+\input{styles/title-style}
 
 \begin{document}
 
 \frontmatter % выключает нумерацию ВСЕГО; здесь начинаются ненумерованные главы: реферат, введение, глоссарий, сокращения и прочее.
 
-\include{tex/title} % Титульный лист
+%\include{tex/title} % Титульный лист
 
 % \NormRefs % Нормативные ссылки 
 
