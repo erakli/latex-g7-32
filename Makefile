@@ -1,100 +1,111 @@
 # Tools
 
-LATEX=xelatex -interaction=nonstopmode -shell-escape
+OUTPUT_DIR=.output
+AUX_DIR=.build
+
+LATEX=xelatex -interaction=nonstopmode -shell-escape -synctex=1 \
+  -aux-directory=$(AUX_DIR) -output-directory=$(OUTPUT_DIR)
 # LATEX=pdflatex
-TD=./utils/texdepend
-GSCONV=./utils/gsconv.sh
-D2T=dot2tex -f pgf --crop --docpreamble "\usepackage[T2A]{fontenc} \usepackage[utf8]{inputenc} \usepackage[english, russian]{babel}"
-PDFTRIMWHITE=pdfcrop
+# TD=./utils/texdepend
+# GSCONV=./utils/gsconv.sh
+# D2T=dot2tex -f pgf --crop --docpreamble "\usepackage[T2A]{fontenc} \usepackage[utf8]{inputenc} \usepackage[english, russian]{babel}"
+# PDFTRIMWHITE=pdfcrop
+
+MAINTEX=rpz
 
 # Output file
-PDF=rpz.pdf
+PDF=$(MAINTEX).pdf
 
 # Input paths
-DIA=graphics/dia
-DOT=graphics/dot
-SVG=graphics/svg
-IMG=graphics/img
-TEX=tex
-DEPS=.deps
-SRC=src
-INC=$(TEX)/inc
+# DIA=graphics/dia
+# DOT=graphics/dot
+# SVG=graphics/svg
+# IMG=graphics/img
+# TEX=tex
+# DEPS=.deps
+# SRC=src
+# INC=$(TEX)/inc
 
-# Input files
-# no .tex allowed in MAINTEX!
-MAINTEX=rpz
-BIBFILE=$(TEX)/rpz.bib
-PREAMBLE=preamble-std.tex
-STYLES=$(TEX)/GostBase.clo $(TEX)/G7-32.sty $(TEX)/G7-32.cls $(TEX)/G2-105.sty
-PARTS_TEX = $(wildcard $(TEX)/[0-9][0-9]-*.tex)
+# # Input files
+# # no .tex allowed in MAINTEX!
+
+# BIBFILE=$(TEX)/rpz.bib
+# PREAMBLE=preamble-std.tex
+# STYLES=$(TEX)/GostBase.clo $(TEX)/G7-32.sty $(TEX)/G7-32.cls $(TEX)/G2-105.sty
+# PARTS_TEX = $(wildcard $(TEX)/[0-9][0-9]-*.tex)
+
+# CLEXT ?= *.aux *.toc *.idx *.ind *.ilg *.log *.out *.lof *.lot *.lol \
+#   *.bbl *.blg *.bak *.dvi *.ps *.pdf *.synctex *.synctex.gz *.nlo *.nst
+# CLFILES ?= $(CLEXT)
+
+# ifeq ($(firstword $(LATEX)), pdflatex)
+# 	CODE_CONVERTION=iconv -f UTF-8 -t KOI8-R 
+# else
+# 	CODE_CONVERTION=cat
+# endif
 
 
-ifeq ($(firstword $(LATEX)), pdflatex)
-	CODE_CONVERTION=iconv -f UTF-8 -t KOI8-R 
-else
-	CODE_CONVERTION=cat
-endif
+all: pdf
 
+.PHONY: all pdf tarball clean
 
-all: $(PDF)
+# PARTS_DEPS=$(PARTS_TEX:tex/%=$(DEPS)/%-deps.mk)
+# -include $(PARTS_DEPS)
 
-.PHONY: all tarball clean
+# MAIN_DEP=$(DEPS)/$(MAINTEX).tex-deps.mk
+# -include $(MAIN_DEP)
 
-PARTS_DEPS=$(PARTS_TEX:tex/%=$(DEPS)/%-deps.mk)
--include $(PARTS_DEPS)
+# $(DEPS)/%-deps.mk: $(TEX)/% Makefile
+# 	mkdir -p $(DEPS)
+# 	(/bin/echo -n "$(PDF): " ; $(TD) -print=fi -format=1 $< | grep -v '^#' | xargs /bin/echo) > $@
 
-MAIN_DEP=$(DEPS)/$(MAINTEX).tex-deps.mk
--include $(MAIN_DEP)
+pdf:
+	$(LATEX) $(MAINTEX).tex
+	bibtex $(AUX_DIR)/$(MAINTEX).aux -include-directory=$(AUX_DIR)
+	cd $(AUX_DIR) && makeindex $(MAINTEX).nlo -s nomencl.ist -o $(MAINTEX).nls 
+	$(LATEX) $(MAINTEX).tex
+	$(LATEX) $(MAINTEX).tex
+	# cp tex/$(PDF) .
 
-$(DEPS)/%-deps.mk: $(TEX)/% Makefile
-	mkdir -p $(DEPS)
-	(/bin/echo -n "$(PDF): " ; $(TD) -print=fi -format=1 $< | grep -v '^#' | xargs /bin/echo) > $@
+# $(INC)/dia/%.pdf: $(DIA)/%.dia
+# 	mkdir -p $(INC)/dia
+# 	dia -e $@-tmp.svg -t svg $<
+# 	inkscape -A $@-tmp.pdf $@-tmp.svg
+# 	$(PDFTRIMWHITE) $@-tmp.pdf $@
 
-$(PDF): $(TEX)/$(MAINTEX).tex $(STYLES) $(BIBFILE)
-	cd tex && $(LATEX) $(MAINTEX)
-	cd tex && bibtex $(MAINTEX)
-	cd tex && makeindex $(MAINTEX).nlo -s nomencl.ist -o $(MAINTEX).nls 
-	cd tex && $(LATEX) $(MAINTEX)
-	cd tex && $(LATEX) $(MAINTEX)
-	cp tex/$(PDF) .
+# $(INC)/svg/%.pdf : $(SVG)/%.svg
+# 	mkdir -p $(INC)/svg/
+# # 	inkscape -A $@ $<
+# # Обрезаем поля в svg автоматом:
+# 	inkscape -A $(INC)/svg/$*-tmp.pdf $<
+# 	cd $(INC)/svg && \
+# 		$(PDFTRIMWHITE) $*-tmp.pdf $*.pdf && \
+# 		rm $*-tmp.pdf
 
-$(INC)/dia/%.pdf: $(DIA)/%.dia
-	mkdir -p $(INC)/dia
-	dia -e $@-tmp.svg -t svg $<
-	inkscape -A $@-tmp.pdf $@-tmp.svg
-	$(PDFTRIMWHITE) $@-tmp.pdf $@
+# $(INC)/img/%.pdf: $(IMG)/%.*
+# 	mkdir -p $(INC)/img
+# 	convert $< -quality 100 $@
 
-$(INC)/svg/%.pdf : $(SVG)/%.svg
-	mkdir -p $(INC)/svg/
-# 	inkscape -A $@ $<
-# Обрезаем поля в svg автоматом:
-	inkscape -A $(INC)/svg/$*-tmp.pdf $<
-	cd $(INC)/svg && \
-		$(PDFTRIMWHITE) $*-tmp.pdf $*.pdf && \
-		rm $*-tmp.pdf
+# $(INC)/dot/%.pdf: $(DOT)/%.dot
+# 	mkdir -p $(INC)/dot
+# 	dot -o$@-tmp.svg -Tsvg $<
+# 	inkscape -A $@-tmp.pdf $@-tmp.svg
+# 	$(PDFTRIMWHITE) $@-tmp.pdf $@
 
-$(INC)/img/%.pdf: $(IMG)/%.*
-	mkdir -p $(INC)/img
-	convert $< -quality 100 $@
-
-$(INC)/dot/%.pdf: $(DOT)/%.dot
-	mkdir -p $(INC)/dot
-	dot -o$@-tmp.svg -Tsvg $<
-	inkscape -A $@-tmp.pdf $@-tmp.svg
-	$(PDFTRIMWHITE) $@-tmp.pdf $@
-
-$(INC)/src/%: $(SRC)/%
-	mkdir -p $(INC)/src
-	$(CODE_CONVERTION) $< > $@
+# $(INC)/src/%: $(SRC)/%
+# 	mkdir -p $(INC)/src
+# 	$(CODE_CONVERTION) $< > $@
 
 clean:
-	find $(TEX)/ -regextype posix-egrep -type f ! -regex ".*\.(sty|tex|clo|cls|bib|bst|gitignore)" -exec $(RM) {} \; ;
-# 	$(RM) $(DIA)/*.pdf $(DIA)/*.eps
-	$(RM) -r $(DEPS)
-	$(RM) -r $(INC)
+	rm -r $(AUX_DIR)
+	rm -r $(OUTPUT_DIR)
+# 	find $(TEX)/ -regextype posix-egrep -type f ! -regex ".*\.(sty|tex|clo|cls|bib|bst|gitignore)" -exec $(RM) {} \; ;
+# # 	$(RM) $(DIA)/*.pdf $(DIA)/*.eps
+# 	$(RM) -r $(DEPS)
+# 	$(RM) -r $(INC)
 
-printpdfs: $(PDF)
-	$(GSCONV) $(PDF)
+# printpdfs: $(PDF)
+# 	$(GSCONV) $(PDF)
 
 distclean: clean
 
