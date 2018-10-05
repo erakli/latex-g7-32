@@ -19,7 +19,6 @@ auto
 *.lot
 *.maf
 *.mtc
-*.mtc
 *.out
 *.fls
 *.synctex.gz
@@ -28,7 +27,6 @@ auto
 *.toc
 *.aux
 *.out
-rpz*.pdf
 *.bbl
 *.blg
 *.eps
@@ -41,3 +39,5 @@ tex/inc
 utils/install.fish
 utils/install.sh
 build
+.build/
+.output/
