@@ -40,8 +40,8 @@
 % Что почитать если кто-то захочет здесь что-то исправлять:
 % https://tex.stackexchange.com/questions/36609/formatting-section-titles
 
-\ProvidesPackage{G2-105}[2015/11/01 v2.00 General reqs. GOST 2.105-95]
 \NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{G2-105}[2015/11/01 v2.00 General reqs. GOST 2.105-95]
 
 \RequirePackage{iftex}
 \input{GostBase.clo}
@@ -732,6 +732,7 @@
 
 % Между подписью и рисунком 10pt
 \captionsetup{labelsep=emdash,aboveskip=10pt,belowskip=0pt,position=bottom}
+% \captionsetup{style=base}  % Попытка избавиться от предупреждения пакета о несовместимом классе документа
 
 % У рисунков выравнивание по центру
 \captionsetup[figure]{justification=centering}

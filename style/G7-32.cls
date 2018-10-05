@@ -44,6 +44,10 @@
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \ProvidesClass{G7-32}[2015/11/01 v2.0 Non Standard LaTeX document class]
 
+% Попытаемся отнаследоваться от стандартного класса, чтобы пакет caption не ругался.
+% На счёт передачи настроек см. https://tex.stackexchange.com/questions/9908
+% \LoadClass{article}  % TODO: неудачно
+
 \RequirePackage{G2-105}
 % minimal values from ГОСТ 7.32-2001 ред. 2009 года.pdf item 6.1.2
 % (a4paper is already selected as the default by GostBase.clo)
