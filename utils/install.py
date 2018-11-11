@@ -12,9 +12,6 @@ import logging
 from argparse import ArgumentParser
 
 
-# logging.basicConfig(level=logging.DEBUG)
-
-
 def parse_args():
     parser = ArgumentParser(description='Installer for g7-32 LaTeX style')
 
@@ -39,6 +36,11 @@ def parse_args():
                         default='copy',
                         help='What to do (default: %(default)s)')
 
+    parser.add_argument('--debug',
+                        dest='debug',
+                        action='store_false',
+                        help='Debug output')
+
     return parser.parse_args()
 
 
@@ -49,6 +51,9 @@ def print_paths(d, name):
 
 def main():
     args = parse_args()
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
 
     current_dir = Path(sys.argv[0]).parent.absolute()
     src_style = Path(current_dir / "../style")
