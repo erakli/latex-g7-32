@@ -111,7 +111,7 @@ def main():
     if args.install_fonts:
         src_fonts = Path(current_dir / "../fonts")
         fonts = Path(os.path.expanduser("~/.fonts"))
-        destination_source[fonts] = [src_fonts]
+        destination_source[fonts] = list(src_fonts.iterdir())
 
     if args.install_lyx:
         src_lyx = Path(current_dir / "../lyx")
