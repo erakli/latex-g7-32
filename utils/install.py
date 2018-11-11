@@ -92,14 +92,6 @@ def main():
 
     bibtex = texmf / "bibtex/bst/gost780u"
 
-    if args.install_fonts:
-        src_fonts = Path(current_dir / "../fonts")
-        fonts = Path(os.path.expanduser("~/.fonts"))
-
-    if args.install_lyx:
-        src_lyx = Path(current_dir / "../lyx")
-        lyx = Path(os.path.expanduser("~/.lyx/layouts"))
-
     destination_source = {
         g2_105: [src_style / "G2-105.sty"],
         g7_32: [src_style / "G7-32.sty", src_style / "cyrtimespatched.sty", src_style / "GostBase.clo",
@@ -107,11 +99,17 @@ def main():
         base: [src_style / "G7-32.cls"],
         local: list(src_style.glob("local-*.sty")) + list(src_style.glob("*.inc.tex")),
         bibtex: [src_bibtex / "gost780u.bst"],
-        lyx: list(src_lyx.glob("layouts/*")),
     }
 
     if args.install_fonts:
+        src_fonts = Path(current_dir / "../fonts")
+        fonts = Path(os.path.expanduser("~/.fonts"))
         destination_source[fonts] = [src_fonts]
+
+    if args.install_lyx:
+        src_lyx = Path(current_dir / "../lyx")
+        lyx = Path(os.path.expanduser("~/.lyx/layouts"))
+        destination_source[lyx] = list(src_lyx.glob("layouts/*"))
 
     logging.debug(print_paths(destination_source, 'destination_source'))
     for destination, source in destination_source.items():
