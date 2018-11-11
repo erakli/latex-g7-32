@@ -15,24 +15,32 @@ from argparse import ArgumentParser
 def parse_args():
     parser = ArgumentParser(description='Installer for g7-32 LaTeX style')
 
+    # 'store_true' and 'store_false' - These are special cases of 'store_const' 
+    # used for storing the values True and False respectively. In addition, 
+    # they create default values of False and True respectively!
+
     parser.add_argument('-k', '--keep-existing',
                         dest='keep_existing',
-                        action='store_true',
+                        action='store_false',
+                        default=True,
                         help='Keep existing files')
 
     parser.add_argument('-u', '--update-packages',
                         dest='update_packages',
-                        action='store_true',
+                        action='store_false',
+                        default=True,
                         help='Update packages')
 
     parser.add_argument('-f', '--install-fonts',
                         dest='install_fonts',
-                        action='store_false',
+                        action='store_true',
+                        default=False,
                         help='Install fonts')
 
     parser.add_argument('--install-lyx',
                         dest='install_lyx',
-                        action='store_false',
+                        action='store_true',
+                        default=False,
                         help='Install LyX layouts')
 
     parser.add_argument('command',
@@ -43,7 +51,8 @@ def parse_args():
 
     parser.add_argument('--debug',
                         dest='debug',
-                        action='store_false',
+                        action='store_true',
+                        default=False,
                         help='Debug output')
 
     return parser.parse_args()
