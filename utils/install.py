@@ -6,7 +6,7 @@ import os
 import sys
 from os import symlink, remove
 from pathlib import Path
-from shutil import copy, copytree, move
+from shutil import copy, copytree, rmtree, move
 from subprocess import call
 import logging
 from argparse import ArgumentParser
@@ -65,6 +65,8 @@ def print_paths(d, name):
 
 def _copy(src, dst):
     if src.is_dir():
+        if dst.exists():
+            rmtree(str(dst))
         copytree(str(src), str(dst))
     else:
         copy(str(src), str(dst))
@@ -86,8 +88,8 @@ def main():
         raise ValueError('Unknown command')
 
     current_dir = Path(sys.argv[0]).parent.absolute()
-    src_style = Path(current_dir / "../style")
-    src_bibtex = Path(current_dir / "../bibtex-styles")
+    src_style = current_dir / "../style"
+    src_bibtex = current_dir / "../bibtex-styles"
 
     texmf = Path(os.environ.get('TEXMFHOME', os.path.expanduser("~/texmf")))
 
@@ -109,9 +111,11 @@ def main():
     }
 
     if args.install_fonts:
-        src_fonts = Path(current_dir / "../fonts")
+        src_fonts = current_dir / "../fonts"
         fonts = Path(os.path.expanduser("~/.fonts"))
-        destination_source[fonts] = list(src_fonts.iterdir())
+        font_folders = ['PTAstra']
+        for folder in font_folders:
+            destination_source[fonts / folder] = [src_fonts / folder]
 
     if args.install_lyx:
         src_lyx = Path(current_dir / "../lyx")
