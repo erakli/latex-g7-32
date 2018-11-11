@@ -21,19 +21,16 @@ def parse_args():
     parser.add_argument('-k', '--keep-existing',
                         dest='keep_existing',
                         action='store_true',
-                        default=True,
                         help='Keep existing files')
 
     parser.add_argument('-u', '--update-packages',
                         dest='update_packages',
                         action='store_true',
-                        default=True,
                         help='Update packages')
 
     parser.add_argument('-f', '--install-fonts',
                         dest='install_fonts',
                         action='store_false',
-                        default=False,
                         help='Install fonts')
 
     parser.add_argument('command',
@@ -67,7 +64,7 @@ def main():
     base = latex / "base"
     local = latex / "local"
 
-    fonts = Path(os.path.expanduser("~/.fonts")))
+    fonts = Path(os.path.expanduser("~/.fonts"))
 
     lyx = Path(os.path.expanduser("~/.lyx/layouts"))
 
