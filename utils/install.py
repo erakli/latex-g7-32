@@ -30,6 +30,12 @@ def parse_args():
                         default=True,
                         help='Update packages')
 
+    parser.add_argument('-f', '--install-fonts',
+                        dest='install_fonts',
+                        action='store_false',
+                        default=False,
+                        help='Install fonts')
+
     parser.add_argument('command',
                         choices=['move', 'copy', 'symlink'],
                         nargs='?',
@@ -51,6 +57,7 @@ def main():
     src_style = Path(current_dir / "../style")
     src_bibtex = Path(current_dir / "../bibtex-styles")
     src_lyx = Path(current_dir / "../lyx")
+    src_fonts = Path(current_dir / "../fonts")
 
     texmf = Path(os.environ.get('TEXMFHOME', os.path.expanduser("~/texmf")))
     bibtex = texmf / "bibtex/bst/gost780u"
@@ -60,14 +67,18 @@ def main():
     base = latex / "base"
     local = latex / "local"
 
+    fonts = Path(os.path.expanduser("~/.fonts")))
+
     lyx = Path(os.path.expanduser("~/.lyx/layouts"))
 
     if args.command == 'copy':
         move_function = lambda src, dst: copy(str(src), str(dst))
     elif args.command == 'symlink':
         move_function = lambda src, dst: symlink(str(src), str(dst / src.name))
-    else:
+    elif args.command == 'move':
         move_function = lambda src, dst: move(str(src), str(dst))
+    else:
+        raise ValueError('Unknown command')
 
     destination_source = {
         g2_105: [src_style / "G2-105.sty"],
@@ -78,6 +89,9 @@ def main():
         bibtex: [src_bibtex / "gost780u.bst"],
         lyx: list(src_lyx.glob("layouts/*")),
     }
+
+    if args.install_fonts:
+        destination_source[fonts] = [src_fonts]
 
     logging.debug(print_paths(destination_source, 'destination_source'))
     for destination, source in destination_source.items():
@@ -98,6 +112,13 @@ def main():
     if args.update_packages:
         try:
             call("texhash", shell=True)
+        except:
+            pass
+
+    if args.install_fonts:
+        try:
+            call('fc-cache -f -v', shell=True)
+            call('luaotfload-tool -u -f', shell=True)
         except:
             pass
 
