@@ -123,7 +123,7 @@ python без babun я не знаю, но исполняемый файл pygme
 
 #### LaTeX пакеты
 ```
-amssymb amsmath caption flafter footmisc hyperref icomma iftex graphicx longtable underscore etoolbox lastpage titlesec flafter amssymb amsmath color mfirstuc nomencl 
+caption etoolbox footmisc was iftex lastpage mfirstuc nomencl titlesec underscore
 ```
 ##### openSUSE
 ```
@@ -141,12 +141,12 @@ cmap babel mathtext pscyr ucs
 ### XeLaTeX-версия
 #### LaTeX пакеты
 ```
-cm-unicode-fonts minted polyglossia xecyr
+cm-unicode minted polyglossia xecyr
 ```
 
 ##### openSUSE
 ```
-cm-unicode-fonts texlive-minted texlive-polyglossia texlive-xecyr
+cm-unicode texlive-minted texlive-polyglossia texlive-xecyr
 ```
 
 #### Программы
