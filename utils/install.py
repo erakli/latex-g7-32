@@ -1,84 +1,105 @@
 #!/usr/bin/env python3
-"""Installer for g7-32 LaTeX style
 
-Usage:
-    install.py ([move] | copy | symlink) ([--keep-existing] | --overwrite-existing) ([--update-packages] | --no-update-packages)
-    install.py --help
-    install.py --version
-
-Options:
-    -k --keep-existing       Keep existing files
-    -o --overwrite-existing  Overwrite existing files
-    -u --update-packages     Update packages
-    -n --no-update-packages  Don't update packages
-    -h --help                Show this screen
-    --version                Show version
-"""
 __version__ = '1.1.0'
 
 import os
 import sys
 from os import symlink, remove
 from pathlib import Path
-from shutil import copyfile as copy, move
-from docopt import docopt
+from shutil import copy, move
 from subprocess import call
 import logging
+from argparse import ArgumentParser
+
+
 # logging.basicConfig(level=logging.DEBUG)
 
+
+def parse_args():
+    parser = ArgumentParser(description='Installer for g7-32 LaTeX style')
+
+    parser.add_argument('-k', '--keep-existing',
+                        dest='keep_existing',
+                        action='store_true',
+                        default=True,
+                        help='Keep existing files')
+
+    parser.add_argument('-u', '--update-packages',
+                        dest='update_packages',
+                        action='store_true',
+                        default=True,
+                        help='Update packages')
+
+    parser.add_argument('command',
+                        choices=['move', 'copy', 'symlink'],
+                        nargs='?',
+                        default='copy',
+                        help='What to do (default: %(default)s)')
+
+    return parser.parse_args()
+
+
+def print_paths(d, name):
+    text = '%s contains:\n\t' % name
+    return text + '\n\t'.join(['%s:\n\t\t%s' % (k, '\n\t\t'.join([str(x) for x in v])) for k, v in d.items()])
+
+
 def main():
-    args = docopt(__doc__, version=__version__)
+    args = parse_args()
 
     current_dir = Path(sys.argv[0]).parent.absolute()
-    src_style = Path(current_dir/"../tex")
-    src_bibtex = Path(current_dir/"../bibtex-styles")
-    src_lyx = Path(current_dir/"../lyx")
-    
+    src_style = Path(current_dir / "../style")
+    src_bibtex = Path(current_dir / "../bibtex-styles")
+    src_lyx = Path(current_dir / "../lyx")
+
     texmf = Path(os.environ.get('TEXMFHOME', os.path.expanduser("~/texmf")))
-    bibtex = texmf/"bibtex/bst/gost780u"
-    latex = texmf/"tex/latex"
-    g2_105 = latex/"G2-105"
-    g7_32 = latex/"G7-32"
-    base = latex/"base"
-    local = latex/"local"
+    bibtex = texmf / "bibtex/bst/gost780u"
+    latex = texmf / "tex/latex"
+    g2_105 = latex / "G2-105"
+    g7_32 = latex / "G7-32"
+    base = latex / "base"
+    local = latex / "local"
 
     lyx = Path(os.path.expanduser("~/.lyx/layouts"))
 
-    move_function = lambda src, dst: move(str(src), str(dst))
-    if args['copy']:
+    if args.command == 'copy':
         move_function = lambda src, dst: copy(str(src), str(dst))
-    elif args['symlink']:
-        move_function = lambda src, dst: symlink(str(src), str(dst/src.name))
+    elif args.command == 'symlink':
+        move_function = lambda src, dst: symlink(str(src), str(dst / src.name))
+    else:
+        move_function = lambda src, dst: move(str(src), str(dst))
 
     destination_source = {
-        g2_105: [src_style/"G2-105.sty"],
-        g7_32: [src_style/"G7-32.sty", src_style/"cyrtimespatched.sty", src_style/"GostBase.clo"],
-        base: [src_style/"G7-32.cls"],
+        g2_105: [src_style / "G2-105.sty"],
+        g7_32: [src_style / "G7-32.sty", src_style / "cyrtimespatched.sty", src_style / "GostBase.clo"],
+        base: [src_style / "G7-32.cls"],
         local: list(src_style.glob("local-*.sty")) + list(src_style.glob("*.inc.tex")),
-        bibtex: [src_bibtex/"gost780u.bst"],
-        lyx: src_lyx.glob("layouts/*"),
+        bibtex: [src_bibtex / "gost780u.bst"],
+        lyx: list(src_lyx.glob("layouts/*")),
     }
-    
-    logging.debug("dict {}".format(destination_source))
+
+    logging.debug(print_paths(destination_source, 'destination_source'))
     for destination, source in destination_source.items():
         logging.debug("creating destination {}".format(destination))
         destination.mkdir(parents=True, exist_ok=True)
 
         logging.debug("copying to {}".format(destination))
         for f in source:
-            if args['--overwrite-existing']:
+            logging.debug("source is {}".format(f))
+            if not args.keep_existing:
                 try:
-                    logging.debug("trying to remove {}".format(destination/f.name))
-                    (destination/f).unlink()
+                    logging.debug("trying to remove {}".format(destination / f.name))
+                    (destination / f).unlink()
                 except FileNotFoundError:
                     pass
             move_function(f.absolute(), destination.absolute())
 
-    if args['--update-packages']:
+    if args.update_packages:
         try:
             call("texhash", shell=True)
         except:
             pass
+
 
 if __name__ == '__main__':
     main()
