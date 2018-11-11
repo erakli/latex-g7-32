@@ -30,6 +30,11 @@ def parse_args():
                         action='store_false',
                         help='Install fonts')
 
+    parser.add_argument('--install-lyx',
+                        dest='install_lyx',
+                        action='store_false',
+                        help='Install LyX layouts')
+
     parser.add_argument('command',
                         choices=['move', 'copy', 'symlink'],
                         nargs='?',
@@ -55,24 +60,6 @@ def main():
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
 
-    current_dir = Path(sys.argv[0]).parent.absolute()
-    src_style = Path(current_dir / "../style")
-    src_bibtex = Path(current_dir / "../bibtex-styles")
-    src_lyx = Path(current_dir / "../lyx")
-    src_fonts = Path(current_dir / "../fonts")
-
-    texmf = Path(os.environ.get('TEXMFHOME', os.path.expanduser("~/texmf")))
-    bibtex = texmf / "bibtex/bst/gost780u"
-    latex = texmf / "tex/latex"
-    g2_105 = latex / "G2-105"
-    g7_32 = latex / "G7-32"
-    base = latex / "base"
-    local = latex / "local"
-
-    fonts = Path(os.path.expanduser("~/.fonts"))
-
-    lyx = Path(os.path.expanduser("~/.lyx/layouts"))
-
     if args.command == 'copy':
         move_function = lambda src, dst: copy(str(src), str(dst))
     elif args.command == 'symlink':
@@ -81,6 +68,28 @@ def main():
         move_function = lambda src, dst: move(str(src), str(dst))
     else:
         raise ValueError('Unknown command')
+
+    current_dir = Path(sys.argv[0]).parent.absolute()
+    src_style = Path(current_dir / "../style")
+    src_bibtex = Path(current_dir / "../bibtex-styles")
+
+    texmf = Path(os.environ.get('TEXMFHOME', os.path.expanduser("~/texmf")))
+
+    latex = texmf / "tex/latex"
+    g2_105 = latex / "G2-105"
+    g7_32 = latex / "G7-32"
+    base = latex / "base"
+    local = latex / "local"
+
+    bibtex = texmf / "bibtex/bst/gost780u"
+
+    if args.install_fonts:
+        src_fonts = Path(current_dir / "../fonts")
+        fonts = Path(os.path.expanduser("~/.fonts"))
+
+    if args.install_lyx:
+        src_lyx = Path(current_dir / "../lyx")
+        lyx = Path(os.path.expanduser("~/.lyx/layouts"))
 
     destination_source = {
         g2_105: [src_style / "G2-105.sty"],
