@@ -71,7 +71,8 @@ def main():
 
     destination_source = {
         g2_105: [src_style / "G2-105.sty"],
-        g7_32: [src_style / "G7-32.sty", src_style / "cyrtimespatched.sty", src_style / "GostBase.clo"],
+        g7_32: [src_style / "G7-32.sty", src_style / "cyrtimespatched.sty", src_style / "GostBase.clo",
+                src_style / "gosttitleGost7-32.sty", src_style / "gosttitleGostRV15-110.sty"],
         base: [src_style / "G7-32.cls"],
         local: list(src_style.glob("local-*.sty")) + list(src_style.glob("*.inc.tex")),
         bibtex: [src_bibtex / "gost780u.bst"],
