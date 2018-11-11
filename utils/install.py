@@ -6,7 +6,7 @@ import os
 import sys
 from os import symlink, remove
 from pathlib import Path
-from shutil import copy, move
+from shutil import copy, copytree, move
 from subprocess import call
 import logging
 from argparse import ArgumentParser
@@ -63,6 +63,13 @@ def print_paths(d, name):
     return text + '\n\t'.join(['%s:\n\t\t%s' % (k, '\n\t\t'.join([str(x) for x in v])) for k, v in d.items()])
 
 
+def _copy(src, dst):
+    if src.is_dir():
+        copytree(str(src), str(dst))
+    else:
+        copy(str(src), str(dst))
+
+
 def main():
     args = parse_args()
 
@@ -70,7 +77,7 @@ def main():
         logging.basicConfig(level=logging.DEBUG)
 
     if args.command == 'copy':
-        move_function = lambda src, dst: copy(str(src), str(dst))
+        move_function = lambda src, dst: _copy(src, dst)
     elif args.command == 'symlink':
         move_function = lambda src, dst: symlink(str(src), str(dst / src.name))
     elif args.command == 'move':
