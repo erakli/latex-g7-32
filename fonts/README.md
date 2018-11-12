@@ -2,6 +2,8 @@
 
 ## Linux
 
+> Может понадобиться установить пакеты `fontconfig` и `lu­a­tex`, если они не были установлены ранее
+
 1. Скопировать шрифты из каталога fonts в `$HOME/.local/share/fonts` или `$HOME/.fonts` в зависимости от дистрибутива
 2. `$ fc-cache -f -v`
 3. `$ luaotfload-tool -u -f`
