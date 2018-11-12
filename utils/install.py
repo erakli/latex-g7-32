@@ -113,7 +113,7 @@ def main():
     if args.install_fonts:
         src_fonts = current_dir / "../fonts"
         fonts = Path(os.path.expanduser("~/.fonts"))
-        font_folders = ['PTAstra']
+        font_folders = [x.name for x in src_fonts.iterdir() if x.is_dir()]
         for folder in font_folders:
             destination_source[fonts / folder] = [src_fonts / folder]
 
